@@ -1,0 +1,29 @@
+---
+- name: Install Apache web server
+  apt:
+    name: apache2
+    state: present
+    update_cache: yes
+
+- name: Create index.html from template
+  template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+    owner: www-data
+    group: www-data
+    mode: "0644"
+  notify: Restart Apache if config changed
+
+- name: Ensure port 80 is allowed (UFW)
+  ufw:
+    rule: allow
+    port: "80"
+    proto: tcp
+  when: ansible_os_family == "Debian"
+
+- name: Start and enable Apache
+  systemd:
+    name: apache2
+    state: started
+    enabled: true
+    daemon_reload: yes

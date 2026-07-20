@@ -1,0 +1,6 @@
+---
+- name: Restart Apache if config changed
+  systemd:
+    name: apache2
+    state: restarted
+    daemon_reload: yes

@@ -1,0 +1,35 @@
+---
+- name: Download and extract Apache Kafka archive
+  hosts: my_group
+  become: true
+  vars:
+    kafka_version: "3.8.1"
+    kafka_url: "https://archive.apache.org/dist/kafka/{{ kafka_version }}/kafka_2.13-{{ kafka_version }}.tgz"
+    kafka_dir: "/opt/kafka"
+    kafka_archive: "/tmp/kafka_{{ kafka_version }}.tgz"
+  tasks:
+    - name: Ensure directory for Kafka exists
+      file:
+        path: "{{ kafka_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Download Kafka archive to target host
+      get_url:
+        url: "{{ kafka_url }}"
+        dest: "{{ kafka_archive }}"
+        mode: "0644"
+        timeout: 300
+
+    - name: Extract Kafka archive
+      unarchive:
+        src: "{{ kafka_archive }}"
+        dest: "{{ kafka_dir }}"
+        remote_src: true
+        extra_opts: ["--strip-components=1"]
+        creates: "{{ kafka_dir }}/bin/kafka-server-start.sh"
+
+    - name: Clean up downloaded archive
+      file:
+        path: "{{ kafka_archive }}"
+        state: absent

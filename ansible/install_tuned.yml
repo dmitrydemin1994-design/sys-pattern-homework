@@ -1,0 +1,22 @@
+---
+- name: Install and enable tuned service
+  hosts: my_group
+  become: true
+  tasks:
+    - name: Install tuned package
+      apt:
+        name: tuned
+        state: present
+        update_cache: yes
+
+    - name: Start tuned service
+      systemd:
+        name: tuned
+        state: started
+        daemon_reload: yes
+
+    - name: Enable tuned on boot
+      systemd:
+        name: tuned
+        enabled: true
+        daemon_reload: yes

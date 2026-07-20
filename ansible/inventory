@@ -1,0 +1,8 @@
+[my_group]
+net2 ansible_host=192.168.0.218
+net1 ansible_host=192.168.0.194
+
+[my_group:vars]
+ansible_user=dmitry
+ansible_become=true
+ansible_python_interpreter=/usr/bin/python3

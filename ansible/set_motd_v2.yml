@@ -1,0 +1,17 @@
+---
+- name: Set custom MOTD with hostname, IP and greeting
+  hosts: my_group
+  become: true
+  gather_facts: true
+  vars:
+    motd_message: |
+      Welcome to the Ansible lab!
+      Host: {{ inventory_hostname }}
+      IP: {{ ansible_default_ipv4.address }}
+      Хорошего дня системному администратору!
+  tasks:
+    - name: Write custom MOTD
+      copy:
+        content: "{{ motd_message }}"
+        dest: /etc/motd
+        mode: "0644"

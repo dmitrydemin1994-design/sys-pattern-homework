@@ -1,0 +1,16 @@
+---
+- name: Set custom MOTD message
+  hosts: my_group
+  become: true
+  vars:
+    motd_message: |
+      Welcome to the Ansible lab!
+      Host: {{ inventory_hostname }}
+      Kafka is installed in /opt/kafka
+      Tuned service is enabled.
+  tasks:
+    - name: Write custom MOTD
+      copy:
+        content: "{{ motd_message }}"
+        dest: /etc/motd
+        mode: "0644"
