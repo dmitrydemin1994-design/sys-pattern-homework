@@ -2,7 +2,7 @@
 
 ### Задание 1
 
-`Выполните действия, приложите файлы с плейбуками и вывод выполнения.
+Выполните действия, приложите файлы с плейбуками и вывод выполнения.
 
 Напишите три плейбука. При написании рекомендуем использовать текстовый редактор с подсветкой синтаксиса YAML.
 Плейбуки должны:
@@ -14,9 +14,10 @@
     3.Изменить приветствие системы (motd) при входе на любое другое. Пожалуйста, в этом задании используйте переменную для задания приветствия. Переменную можно задавать любым удобным способом.
 
 
-`
 
-Инвентарь (inventory):
+
+#### Инвентарь (inventory):
+``` ini
 [my_group]
 net2 ansible_host=192.168.0.218
 net1 ansible_host=192.168.0.194
@@ -24,8 +25,11 @@ net1 ansible_host=192.168.0.194
 ansible_user=dmitry
 ansible_become=true
 ansible_python_interpreter=/usr/bin/python3
+```
 
-Плейбук download_kafka.yml (Kafka: скачивание, распаковка, очистка):
+#### Плейбук download_kafka.yml (Kafka: скачивание, распаковка, очистка):
+
+``` yaml
 ---
 - name: Download and extract Apache Kafka archive
   hosts: my_group
@@ -58,8 +62,11 @@ ansible_python_interpreter=/usr/bin/python3
       file:
         path: "{{ kafka_archive }}"
         state: absent
+```
 
-Проверка Kafka:
+#### Проверка Kafka:
+
+``` text
 $ ssh dmitry@192.168.0.218 "ls -ld /opt/kafka && ls /opt/kafka | head -3"
 drwxr-xr-x 7 root root 4096 июл 20 07:33 /opt/kafka
 bin
@@ -70,9 +77,13 @@ drwxr-xr-x 7 root root 4096 июл 20 07:33 /opt/kafka
 bin
 config
 libs
-Лог: /home/dmitry/sys-pattern-homework/ansible/output_kafka.log
+```
 
-Плейбук install_tuned.yml (tuned: установка, старт, автозагрузка):
+#### Лог: sys-pattern-homework/ansible/output_kafka.log
+
+#### Плейбук install_tuned.yml (tuned: установка, старт, автозагрузка):
+
+``` yaml
 ---
 - name: Install and enable tuned service
   hosts: my_group
@@ -93,17 +104,22 @@ libs
         name: tuned
         enabled: true
         daemon_reload: yes
+```
 
-Проверка tuned:
+#### Проверка tuned:
+``` text
 $ ssh dmitry@192.168.0.218 "systemctl is-enabled tuned; systemctl is-active tuned"
 enabled
 active
 $ ssh dmitry@192.168.0.194 "systemctl is-enabled tuned; systemctl is-active tuned"
 enabled
 active
-Лог: /home/dmitry/sys-pattern-homework/ansible/output_tuned.log
+```
 
-Плейбук set_motd.yml (MOTD с переменной и подстановкой хоста):
+#### Лог: /home/dmitry/sys-pattern-homework/ansible/output_tuned.log
+
+#### Плейбук set_motd.yml (MOTD с переменной и подстановкой хоста):
+``` yaml
 ---
 - name: Set custom MOTD message
   hosts: my_group
@@ -120,8 +136,10 @@ active
         content: "{{ motd_message }}"
         dest: /etc/motd
         mode: "0644"
+```
 
-Проверка MOTD:
+#### Проверка MOTD:
+``` text
 $ ssh dmitry@192.168.0.218 "cat /etc/motd"
 Welcome to the Ansible lab!
 Host: net2
@@ -132,18 +150,21 @@ Welcome to the Ansible lab!
 Host: net1
 Kafka is installed in /opt/kafka
 Tuned service is enabled.
-Лог: /home/dmitry/sys-pattern-homework/ansible/output_motd.log.
+```
+
+#### Лог: /home/dmitry/sys-pattern-homework/ansible/output_motd.log.
 
 ---
 
 ### Задание 2
 
-`Выполните действия, приложите файлы с модифицированным плейбуком и вывод выполнения.
+Выполните действия, приложите файлы с модифицированным плейбуком и вывод выполнения.
 
-Модифицируйте плейбук из пункта 3, задания 1. В качестве приветствия он должен установить IP-адрес и hostname управляемого хоста, пожелание хорошего дня системному администратору.`
+Модифицируйте плейбук из пункта 3, задания 1. В качестве приветствия он должен установить IP-адрес и hostname управляемого хоста, пожелание хорошего дня системному администратору.
 
 
-Плейбук set_motd_v2.yml :
+#### Плейбук set_motd_v2.yml :
+``` yaml
 ---
 - name: Set custom MOTD with hostname, IP and greeting
   hosts: my_group
@@ -161,9 +182,10 @@ Tuned service is enabled.
         content: "{{ motd_message }}"
         dest: /etc/motd
         mode: "0644"
+```
 
-
-Проверка результата:
+#### Проверка результата:
+``` text
 $ ssh dmitry@192.168.0.218 "cat /etc/motd"
 Welcome to the Ansible lab!
 Host: net2
@@ -174,13 +196,15 @@ Welcome to the Ansible lab!
 Host: net1
 IP: 192.168.0.194
 Хорошего дня системному администратору!
-Лог: /home/dmitry/sys-pattern-homework/ansible/output_motd_v2.log
+```
+
+#### Лог: /home/dmitry/sys-pattern-homework/ansible/output_motd_v2.log
 
 ---
 
 ### Задание 3
 
-`Выполните действия, приложите архив с ролью и вывод выполнения.
+Выполните действия, приложите архив с ролью и вывод выполнения.
 
 Ознакомьтесь со статьёй «Ansible - это вам не bash», сделайте соответствующие выводы и не используйте модули shell или command при выполнении задания.
 
@@ -193,10 +217,10 @@ IP: 192.168.0.194
     3. Открыть порт 80, если необходимо, запустить сервер и добавить его в автозагрузку.
 
     4. Сделать проверку доступности веб-сайта (ответ 200, модуль uri).
-`
 
-### Структура архива роли
-```text
+
+#### Структура архива роли
+``` text
 roles/
 └── apache_info
     ├── handlers/
@@ -205,8 +229,10 @@ roles/
     │   └── main.yml
     └── templates/
         └── index.html.j2
+```
 
-### Плейбук playbook_apache.yml
+#### Плейбук playbook_apache.yml
+``` yaml
 ---
 - name: Deploy Apache with system info page and validate HTTP 200
   hosts: my_group
@@ -225,8 +251,10 @@ roles/
       failed_when: apache_check.status != 200
       tags:
         - verify
+```
 
-### Роль: roles/apache_info/tasks/main.yml
+#### Роль: roles/apache_info/tasks/main.yml
+``` yaml
 ---
 - name: Install Apache web server
   apt:
@@ -256,16 +284,20 @@ roles/
     state: started
     enabled: true
     daemon_reload: yes
+```
 
-### Обработчик: roles/apache_info/handlers/main.yml
+#### Обработчик: roles/apache_info/handlers/main.yml
+``` yaml
 ---
 - name: Restart Apache if config changed
   systemd:
     name: apache2
     state: restarted
     daemon_reload: yes
+```
 
-### Шаблон: roles/apache_info/templates/index.html.j2
+#### Шаблон: roles/apache_info/templates/index.html.j2
+``` html
 <!DOCTYPE html>
 <html>
   <head>
@@ -304,12 +336,15 @@ roles/
     <p>Generated by Ansible + Jinja2</p>
   </body>
 </html>
+```
 
-### Проверка доступности (HTTP 200)
+#### Проверка доступности (HTTP 200)
 
+``` text
  ssh dmitry@192.168.0.218 "curl -s -o /dev/null -w '%{http_code}' http://localhost"
 200
  ssh dmitry@192.168.0.194 "curl -s -o /dev/null -w '%{http_code}' http://localhost"
 200
+```
 
-Лог: /home/dmitry/sys-pattern-homework/ansible/output_apache.log
+#### Лог: /home/dmitry/sys-pattern-homework/ansible/output_apache.log
