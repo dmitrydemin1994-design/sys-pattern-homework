@@ -1,0 +1,15 @@
+
+PLAY [Set custom MOTD message] *************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [net1]
+ok: [net2]
+
+TASK [Write custom MOTD] *******************************************************
+changed: [net1]
+changed: [net2]
+
+PLAY RECAP *********************************************************************
+net1                       : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+net2                       : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

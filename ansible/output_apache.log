@@ -1,0 +1,61 @@
+
+PLAY [Deploy Apache with system info page] *************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [net2]
+ok: [net1]
+
+TASK [apache_info : Install Apache web server] *********************************
+ok: [net2]
+ok: [net1]
+
+TASK [apache_info : Create index.html from template] ***************************
+[WARNING]: Deprecation warnings can be disabled by setting `deprecation_warnings=False` in ansible.cfg.
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /home/dmitry/sys-pattern-homework/ansible/roles/apache_info/templates/index.html.j2
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+changed: [net2]
+changed: [net1]
+
+TASK [apache_info : Ensure port 80 is allowed (UFW)] ***************************
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /home/dmitry/sys-pattern-homework/ansible/roles/apache_info/tasks/main.yml:22:9
+
+20     port: "80"
+21     proto: tcp
+22   when: ansible_os_family == "Debian"
+           ^ column 9
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+changed: [net1]
+changed: [net2]
+
+TASK [apache_info : Start and enable Apache] ***********************************
+ok: [net1]
+ok: [net2]
+
+TASK [Verify Apache returns HTTP 200] ******************************************
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /home/dmitry/sys-pattern-homework/ansible/playbook_apache.yml:11:14
+
+ 9     - name: Verify Apache returns HTTP 200
+10       uri:
+11         url: "http://{{ ansible_default_ipv4.address }}"
+                ^ column 14
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+ok: [net1]
+ok: [net2]
+
+RUNNING HANDLER [apache_info : Restart Apache if config changed] ***************
+changed: [net1]
+changed: [net2]
+
+PLAY RECAP *********************************************************************
+net1                       : ok=7    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+net2                       : ok=7    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

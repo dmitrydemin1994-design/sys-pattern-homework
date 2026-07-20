@@ -1,0 +1,23 @@
+
+PLAY [Install and enable tuned service] ****************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [net1]
+ok: [net2]
+
+TASK [Install tuned package] ***************************************************
+changed: [net1]
+changed: [net2]
+
+TASK [Start tuned service] *****************************************************
+ok: [net2]
+ok: [net1]
+
+TASK [Enable tuned on boot] ****************************************************
+ok: [net2]
+ok: [net1]
+
+PLAY RECAP *********************************************************************
+net1                       : ok=4    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+net2                       : ok=4    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

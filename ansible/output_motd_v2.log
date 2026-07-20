@@ -1,0 +1,26 @@
+
+PLAY [Set custom MOTD with hostname, IP and greeting] **************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [net1]
+ok: [net2]
+
+TASK [Write custom MOTD] *******************************************************
+[WARNING]: Deprecation warnings can be disabled by setting `deprecation_warnings=False` in ansible.cfg.
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /home/dmitry/sys-pattern-homework/ansible/set_motd_v2.yml:7:19
+
+5   gather_facts: true
+6   vars:
+7     motd_message: |
+                    ^ column 19
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+changed: [net2]
+changed: [net1]
+
+PLAY RECAP *********************************************************************
+net1                       : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+net2                       : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

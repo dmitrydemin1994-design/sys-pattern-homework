@@ -1,0 +1,27 @@
+
+PLAY [Download and extract Apache Kafka archive] *******************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [net2]
+ok: [net1]
+
+TASK [Ensure directory for Kafka exists] ***************************************
+changed: [net2]
+changed: [net1]
+
+TASK [Download Kafka archive to target host] ***********************************
+changed: [net1]
+changed: [net2]
+
+TASK [Extract Kafka archive] ***************************************************
+changed: [net2]
+changed: [net1]
+
+TASK [Clean up downloaded archive] *********************************************
+changed: [net2]
+changed: [net1]
+
+PLAY RECAP *********************************************************************
+net1                       : ok=5    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+net2                       : ok=5    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
