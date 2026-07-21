@@ -1,0 +1,29 @@
+# Local .terraform directories and files
+**/.terraform/*
+.terraform*
+
+!.terraformrc
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+terraform.tfvars
+**/authorized_key.json
+
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.tfplan
+*.retry
+id_ed25519
+id_ed25519.pub
+*.key
+*.pem
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

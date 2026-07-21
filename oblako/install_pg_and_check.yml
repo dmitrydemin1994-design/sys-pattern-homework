@@ -1,0 +1,40 @@
+---
+- name: Install PostgreSQL and check services on dbservers
+  hosts: dbservers
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install PostgreSQL
+      apt:
+        name: postgresql
+        state: present
+
+    - name: Ensure PostgreSQL service is running and enabled
+      systemd:
+        name: postgresql
+        state: started
+        enabled: true
+
+    - name: Check PostgreSQL status via systemctl
+      command: systemctl is-active postgresql
+      register: pg_status
+      changed_when: false
+
+    - name: Debug PostgreSQL status
+      debug:
+        msg: "PostgreSQL status on {{ inventory_hostname }}: {{ pg_status.stdout }}"
+
+    - name: Get PostgreSQL version
+      command: psql --version
+      register: pg_version
+      changed_when: false
+
+    - name: Debug PostgreSQL version
+      debug:
+        msg: "PostgreSQL version on {{ inventory_hostname }}: {{ pg_version.stdout }}"

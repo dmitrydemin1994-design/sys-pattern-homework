@@ -1,0 +1,49 @@
+---
+- name: Install and start Nginx on webservers
+  hosts: webservers
+  gather_facts: yes
+  vars:
+    ansible_ssh_user: user
+    ansible_become: true
+    ansible_become_method: sudo
+  pre_tasks:
+    - name: Wait for SSH to be ready
+      wait_for:
+        host: "{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}"
+        port: 22
+        delay: 5
+        timeout: 300
+        state: started
+        search_regex: OpenSSH
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Ensure nginx is running and enabled
+      systemd:
+        name: nginx
+        enabled: yes
+        state: started
+
+    - name: Verify nginx status
+      command: systemctl is-active --quiet nginx
+      register: nginx_status
+      failed_when: nginx_status.rc != 0
+      changed_when: false
+
+    - name: Show nginx version
+      command: nginx -v
+      register: nginx_version
+      changed_when: false
+      failed_when: false
+
+    - debug:
+        msg: "Nginx installed on {{ inventory_hostname }}: {{ nginx_version.stdout }}"
