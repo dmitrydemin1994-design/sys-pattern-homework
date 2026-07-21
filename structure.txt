@@ -1,0 +1,86 @@
+Это на моем хосте
+
+sys-pattern-homework
+├── ansible
+│   ├── download_kafka.yml
+│   ├── install_tuned.yml
+│   ├── inventory
+│   ├── output_apache.log
+│   ├── output_kafka.log
+│   ├── output_motd.log
+│   ├── output_motd_v2.log
+│   ├── output_tuned.log
+│   ├── playbook_apache.yml
+│   ├── set_motd_v2.yml
+│   └── set_motd.yml
+├── ansible.cfg
+├── md-instruction.md
+├── oblako
+│   ├── ansible.cfg
+│   ├── authorized_key.json
+│   ├── cloud-init.yml
+│   ├── hosts.ini
+│   ├── install_pg_and_check.yml
+│   ├── network.tf
+│   ├── nginx.yml
+│   ├── providers.tf
+│   ├── README.MD
+│   ├── redme.md
+│   ├── terraform.tfstate
+│   ├── terraform.tfstate.backup
+│   ├── terraform.tfvars
+│   ├── variables.tf
+│   └── vms.tf
+├── README.md
+├── roles
+│   └── apache_info
+│       ├── handlers
+│       │   └── main.yml
+│       ├── tasks
+│       │   └── main.yml
+│       └── templates
+│           └── index.html.j2
+├── screen-instruction.md
+├── structure.txt
+└── Terraform
+    ├── main.tf
+    ├── providers.tf
+    ├── terraform.tfstate
+    ├── terraform.tfstate.backup
+    └── variables.tf
+
+9 directories, 39 files
+
+это в браузере
+
+    ansible
+        download_kafka.yml
+        install_tuned.yml
+        inventory
+        output_apache.log
+        output_kafka.log
+        output_motd.log
+        output_motd_v2.log
+        output_tuned.log
+        playbook_apache.yml
+        set_motd.yml
+        set_motd_v2.yml
+    img
+        img15.png
+        img16.png
+        img17.png
+        img18.png
+        img19.png
+        img20.png
+    roles/apache_info
+        handlers
+            main.yml
+        tasks
+            main.yml
+        templates
+            index.html.j2
+    .gitignore
+    README.md
+    ansible.cfg
+    md-instruction.md
+    screen-instruction.md
