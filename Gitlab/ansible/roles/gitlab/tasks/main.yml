@@ -1,0 +1,81 @@
+- name: Установить Docker
+  apt:
+    name: docker.io
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Убедиться, что Docker запущен
+  service:
+    name: docker
+    state: started
+    enabled: yes
+  become: yes
+
+
+- name: Создать базовую директорию для GitLab
+  file:
+    path: /srv/gitlab
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: yes
+
+
+- name: Создать директории для данных GitLab (config, data, logs)
+  file:
+    path: "/srv/gitlab/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+  loop:
+    - config
+    - data
+    - logs
+  become: yes
+
+- name: Добавить пользователя dmitry в группу docker
+  user:
+    name: dmitry
+    groups: docker
+    append: yes
+  become: yes
+
+- name: Перезапустить Docker для применения прав группы
+  service:
+    name: docker
+    state: restarted
+  become: yes
+
+
+- name: Удалить старый контейнер gitlab, если существует
+  command: docker rm -f gitlab
+  ignore_errors: yes
+  become: yes
+
+- name: Запустить GitLab в Docker 
+  command: >
+    docker run -d
+      --name gitlab
+      --restart always
+      -p 80:80 -p 443:443 -p 2222:22
+      -v /srv/gitlab/config:/etc/gitlab:rw
+      -v /srv/gitlab/logs:/var/log/gitlab:rw
+      -v /srv/gitlab/data:/var/opt/gitlab:rw
+      -e ALERTMANAGER_ENABLE_CLUSTER=false
+      -e GITLAB_OMNIBUS_CONFIG="external_url=\"http://{{ ansible_host }}\""
+      gitlab/gitlab-ce:latest
+  become: yes
+  register: gitlab_start
+
+- name: Показать статус запуска GitLab
+  debug:
+    msg: "GitLab container started: {{ gitlab_start.stdout }}"
+  when: gitlab_start is success
+
+- name: Показать ошибку, если запуск не удался
+  debug:
+    msg: "Failed to start GitLab container: {{ gitlab_start.stderr }}"
+  when: gitlab_start is failed

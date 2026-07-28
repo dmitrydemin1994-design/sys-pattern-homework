@@ -1,0 +1,15 @@
+---
+- name: Настроить GitLab на ВМ gitlab
+  hosts: gitlab
+  become: yes
+  vars:
+    # Получаем публичный IP из inventory
+    gitlab_public_ip: "{{ hostvars['gitlab']['ansible_host'] }}"
+  roles:
+    - gitlab
+
+- name: Настроить GitLab Runner на ВМ runner
+  hosts: runner
+  become: yes
+  roles:
+    - gitlab-runner

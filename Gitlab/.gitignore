@@ -1,16 +1,8 @@
-#*.log
-.DS_Store
-.vscode/
-.idea/
-__pycache__/
-*.pyc
-
 # Local .terraform directories and files
 **/.terraform/*
 .terraform*
-**/.terraform*
+
 !.terraformrc
-**/.terraformrc
 
 # .tfstate files
 *.tfstate

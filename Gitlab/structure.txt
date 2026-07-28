@@ -1,0 +1,44 @@
+Gitlab
+├── ansible
+│   ├── hosts.ini
+│   ├── roles
+│   │   ├── gitlab
+│   │   │   └── tasks
+│   │   │       └── main.yml
+│   │   └── gitlab-runner
+│   │       └── tasks
+│   │           └── main.yml
+│   └── site.yml
+├── ansible.cfg
+├── authorized_key.json
+├── cloud-init.yml
+├── .gitignore
+├── network.tf
+├── providers.tf
+├── structure.txt
+├── .terraform
+│   └── providers
+│       └── registry.terraform.io
+│           ├── hashicorp
+│           │   └── local
+│           │       └── 2.9.0
+│           │           └── linux_amd64
+│           │               ├── LICENSE.txt
+│           │               └── terraform-provider-local_v2.9.0_x5
+│           └── yandex-cloud
+│               └── yandex
+│                   └── 0.129.0
+│                       └── linux_amd64
+│                           ├── CHANGELOG.md
+│                           ├── LICENSE
+│                           ├── README.md
+│                           └── terraform-provider-yandex_v0.129.0
+├── .terraform.lock.hcl
+├── .terraformrc
+├── terraform.tfstate
+├── terraform.tfstate.backup
+├── terraform.tfstate.bak
+├── variables.tf
+└── vms.tf
+
+18 directories, 24 files

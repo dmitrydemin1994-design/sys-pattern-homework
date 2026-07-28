@@ -1,0 +1,48 @@
+---
+- name: Установить Docker
+  apt:
+    name: docker.io
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Добавить пользователя dmitry в группу docker
+  user:
+    name: dmitry
+    groups: docker
+    append: yes
+  become: yes
+
+- name: Создать директорию для конфига GitLab Runner
+  file:
+    path: /srv/gitlab-runner/config
+    state: directory
+    owner: dmitry
+    group: dmitry
+    mode: "0755"
+  become: yes
+
+- name: Убедиться, что Docker запущен
+  service:
+    name: docker
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Запустить GitLab Runner как Docker-контейнер
+  command: >
+    docker run -d
+    --name gitlab-runner
+    --restart always
+    --network host
+    -v /srv/gitlab-runner/config:/etc/gitlab-runner
+    -v /var/run/docker.sock:/var/run/docker.sock
+    gitlab/gitlab-runner:latest
+  become: yes
+  failed_when: false
+  register: runner_start
+
+- name: Показать статус запуска (если контейнер уже был)
+  debug:
+    msg: "gitlab-runner container already exists or started. Output: {{ runner_start.stderr }}"
+  when: runner_start.rc != 0 and runner_start.stderr is search("already in use")
