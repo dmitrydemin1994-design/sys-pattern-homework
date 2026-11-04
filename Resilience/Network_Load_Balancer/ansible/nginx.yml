@@ -1,0 +1,45 @@
+---
+- name: Install and run Nginx with minimal page
+  hosts: webservers
+  become: true
+  gather_facts: false  
+
+  tasks:
+    - name: Wait for SSH to become available
+      ansible.builtin.wait_for_connection:
+        delay: 5
+        timeout: 300
+        sleep: 5
+        connect_timeout: 5
+
+    - name: Gather facts now that we are connected
+      ansible.builtin.setup:
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+
+    - name: Create minimal index.html with VM name
+      ansible.builtin.copy:
+        content: "Я {{ inventory_hostname }}"
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: "0644"
+
+    - name: Remove default Nginx page
+      ansible.builtin.file:
+        path: /var/www/html/index.nginx-debian.html
+        state: absent
+
+    - name: Ensure Nginx is running and enabled
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
