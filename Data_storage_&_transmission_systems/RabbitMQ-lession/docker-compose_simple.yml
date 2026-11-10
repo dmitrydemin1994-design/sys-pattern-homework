@@ -1,0 +1,41 @@
+version: "3.8"
+services:
+  rabbitmq1:
+    image: rabbitmq:3.10.7-management
+    hostname: rabbitmq1
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+      - RABBITMQ_CONFIG_FILE=/config/rabbitmq
+      - RABBITMQ_ERLANG_COOKIE=${RABBITMQ_ERLANG_COOKIE}
+      - RABBITMQ_NODE_PORT=5672
+    volumes:
+      - ./config:/config
+    ports:
+      - 15672:15672
+      - 5672:5672
+  rabbitmq2:
+    image: rabbitmq:3.10.7-management
+    hostname: rabbitmq2
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+      - RABBITMQ_CONFIG_FILE=/config/rabbitmq
+      - RABBITMQ_ERLANG_COOKIE=${RABBITMQ_ERLANG_COOKIE}
+      - RABBITMQ_NODE_PORT=5672
+    volumes:
+      - ./config:/config
+  rabbitmq3:
+    image: rabbitmq:3.10.7-management
+    hostname: rabbitmq3
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+      - RABBITMQ_CONFIG_FILE=/config/rabbitmq
+      - RABBITMQ_ERLANG_COOKIE=${RABBITMQ_ERLANG_COOKIE}
+      - RABBITMQ_NODE_PORT=5672
+    volumes:
+      - ./config:/config
