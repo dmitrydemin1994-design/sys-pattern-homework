@@ -27,6 +27,8 @@ services:
       - ./config:/config
       - ./defs/def.json:/etc/rabbitmq/definitions.json:ro
       - ./defs/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+    ports:
+      - 5673:5672
 
   rabbitmq3:
     image: rabbitmq:3.10.7-management

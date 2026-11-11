@@ -16,3 +16,6 @@ build/
 pytest_aiohttpreq_p.egg-info/
 pytest_elastic_p.egg-info/
 env
+.venv/
+__pycache__/
+*.pyc

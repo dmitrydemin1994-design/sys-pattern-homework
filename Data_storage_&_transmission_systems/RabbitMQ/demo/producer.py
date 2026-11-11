@@ -7,7 +7,7 @@ params = pika.URLParameters(URI)
 conn = pika.BlockingConnection(params)
 channel = conn.channel()
 
-channel.queue_declare(queue="test_q")
+channel.queue_declare(queue="hello")
 
 if __name__ == "__main__":
 
@@ -16,7 +16,7 @@ if __name__ == "__main__":
     while True:
         channel.basic_publish(
             exchange="",
-            routing_key="test_q",
+            routing_key="hello",
             body=f"Hello, SYSDB-32! - {count}",
         )
         count += 1

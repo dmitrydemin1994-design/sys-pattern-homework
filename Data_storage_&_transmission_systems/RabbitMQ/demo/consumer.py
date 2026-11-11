@@ -15,7 +15,7 @@ def callback(ch, method, properties, body) -> None:
 
 
 channel.basic_consume(
-    queue="test_q",
+    queue="hello",
     on_message_callback=callback,
     auto_ack=True,
     consumer_tag="netology_consumer",

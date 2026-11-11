@@ -7,12 +7,12 @@ params = pika.URLParameters(URI)
 conn = pika.BlockingConnection(params)
 channel = conn.channel()
 
-channel.queue_declare(queue="test_q")
+channel.queue_declare(queue="hello")
 
 if __name__ == "__main__":
 
     channel.basic_publish(
         exchange="",
-        routing_key="test_q",
+        routing_key="hello",
         body="Hello, SYSDB-32! - 27.06.2024",
     )
