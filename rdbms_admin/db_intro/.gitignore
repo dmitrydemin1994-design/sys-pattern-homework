@@ -1,0 +1,6 @@
+pgdata/
+ansible/vars.yml
+__pycache__/
+*.pyc
+.venv/
+*.log

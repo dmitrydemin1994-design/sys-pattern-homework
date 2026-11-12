@@ -1,0 +1,181 @@
+---
+- name: Развернуть PostgreSQL в Docker и заполнить БД из Excel
+  hosts: local
+  become: true
+  vars_files:
+    - /home/dmitry/sys-pattern-homework/rdbms_admin/db_intro/ansible/vars.yml
+
+  tasks:
+
+    # ---------------------------------------------------------
+    # 0. Проверка исходных файлов
+    # ---------------------------------------------------------
+    - name: Проверить наличие исходных файлов
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      loop:
+        - "{{ sql_schema_file }}"
+        - "{{ python_loader }}"
+        - "{{ excel_file }}"
+      register: files_check
+
+    - name: Прервать, если чего-то не хватает
+      ansible.builtin.fail:
+        msg: "Не найден файл: {{ item.item }}"
+      loop: "{{ files_check.results }}"
+      when: not item.stat.exists
+
+    # ---------------------------------------------------------
+    # 1. Docker
+    # ---------------------------------------------------------
+    - name: Проверить, установлен ли Docker
+      ansible.builtin.command: docker --version
+      register: docker_check
+      changed_when: false
+      failed_when: false
+
+    - name: Установить Docker (если не установлен)
+      ansible.builtin.apt:
+        name: docker.io
+        state: present
+        update_cache: true
+      when: docker_check.rc != 0
+
+    - name: Убедиться, что служба Docker запущена
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    # ---------------------------------------------------------
+    # 2. Контейнер PostgreSQL
+    # ---------------------------------------------------------
+    - name: Проверить, существует ли контейнер
+      ansible.builtin.command: "docker inspect {{ pg_container_name }}"
+      register: container_exists
+      changed_when: false
+      failed_when: false
+
+    - name: Создать каталог для данных PostgreSQL
+      ansible.builtin.file:
+        path: "{{ pg_data_volume }}"
+        state: directory
+        mode: "0755"
+
+    - name: Запустить контейнер PostgreSQL
+      ansible.builtin.command: >
+        docker run -d
+        --name {{ pg_container_name }}
+        -e POSTGRES_USER={{ pg_superuser }}
+        -e POSTGRES_PASSWORD={{ pg_superuser_password }}
+        -e POSTGRES_DB={{ pg_database }}
+        -p {{ pg_host_port }}:{{ pg_container_port }}
+        -v {{ pg_data_volume }}:/var/lib/postgresql/data
+        {{ pg_image }}
+      when: container_exists.rc != 0
+
+    - name: Запустить существующий контейнер (если остановлен)
+      ansible.builtin.command: "docker start {{ pg_container_name }}"
+      when: container_exists.rc == 0
+      register: docker_start
+      changed_when: "'started' in (docker_start.stdout | default(''))"
+
+    # ---------------------------------------------------------
+    # 3. Ждём готовности PostgreSQL
+    # ---------------------------------------------------------
+    - name: Дождаться готовности PostgreSQL
+      ansible.builtin.command: >
+        docker exec {{ pg_container_name }}
+        pg_isready -U {{ pg_superuser }} -d {{ pg_database }}
+      register: pg_ready
+      until: pg_ready.rc == 0
+      retries: "{{ pg_ready_retries }}"
+      delay: "{{ pg_ready_delay }}"
+      changed_when: false
+
+    # ---------------------------------------------------------
+    # 4. Прикладной пользователь
+    # ---------------------------------------------------------
+    - name: Создать пользователя {{ pg_app_user }} (если нет)
+      ansible.builtin.shell: |
+        docker exec -i {{ pg_container_name }} \
+          psql -U {{ pg_superuser }} -d {{ pg_database }} -tAc \
+          "SELECT 1 FROM pg_roles WHERE rolname='{{ pg_app_user }}'" \
+        | grep -q 1 \
+        || docker exec -i {{ pg_container_name }} \
+          psql -U {{ pg_superuser }} -d {{ pg_database }} -c \
+          "CREATE USER {{ pg_app_user }} WITH PASSWORD '{{ pg_app_password }}';"
+      args:
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Выдать права на БД
+      ansible.builtin.command: >
+        docker exec -i {{ pg_container_name }}
+        psql -U {{ pg_superuser }} -d {{ pg_database }} -c
+        "GRANT ALL PRIVILEGES ON DATABASE {{ pg_database }} TO {{ pg_app_user }};"
+      changed_when: false
+
+    # ---------------------------------------------------------
+    # 5. script.sql
+    # ---------------------------------------------------------
+    - name: Скопировать script.sql в контейнер
+      ansible.builtin.command: >
+        docker cp {{ sql_schema_file }} {{ pg_container_name }}:/schema.sql
+
+    - name: Выполнить script.sql
+      ansible.builtin.command: >
+        docker exec -i {{ pg_container_name }}
+        psql -U {{ pg_superuser }} -d {{ pg_database }} -v ON_ERROR_STOP=1 -f /schema.sql
+      register: schema_result
+      changed_when: "'CREATE TABLE' in schema_result.stdout"
+
+    # ---------------------------------------------------------
+    # 6. Python-зависимости
+    # ---------------------------------------------------------
+    - name: Установить Python-зависимости
+      ansible.builtin.apt:
+        name: "{{ python_packages }}"
+        state: present
+        update_cache: true
+
+    # ---------------------------------------------------------
+    # 7. Загрузка данных из Excel
+    # ---------------------------------------------------------
+    - name: Загрузить данные из Excel в PostgreSQL
+      ansible.builtin.command:
+        cmd: "python3 {{ python_loader }} {{ excel_file }}"
+        chdir: "{{ project_dir }}"
+      environment:
+        DB_HOST: "127.0.0.1"
+        DB_PORT: "{{ pg_host_port }}"
+        DB_NAME: "{{ pg_database }}"
+        DB_USER: "{{ pg_superuser }}"
+        PGPASSWORD: "{{ pg_superuser_password }}"
+      register: loader_result
+      changed_when: "'COMMIT' in loader_result.stdout"
+
+    - name: Показать вывод загрузчика
+      ansible.builtin.debug:
+        var: loader_result.stdout_lines
+
+    # ---------------------------------------------------------
+    # 8. Финальная проверка
+    # ---------------------------------------------------------
+    - name: Проверить количество записей в таблицах
+      ansible.builtin.command: >
+        docker exec -i {{ pg_container_name }}
+        psql -U {{ pg_superuser }} -d {{ pg_database }} -c
+        "SELECT 'employees' AS t, count(*) FROM employees
+         UNION ALL SELECT 'positions', count(*) FROM positions
+         UNION ALL SELECT 'projects', count(*) FROM projects
+         UNION ALL SELECT 'departments', count(*) FROM departments
+         UNION ALL SELECT 'branch_addresses', count(*) FROM branch_addresses
+         UNION ALL SELECT 'employee_projects', count(*) FROM employee_projects
+         ORDER BY t;"
+      register: final_check
+      changed_when: false
+
+    - name: Показать итог
+      ansible.builtin.debug:
+        var: final_check.stdout_lines

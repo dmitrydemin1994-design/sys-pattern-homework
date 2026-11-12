@@ -61,3 +61,4 @@ env
 __pycache__/
 *.pyc
 *.log
+directory_structure.txt
